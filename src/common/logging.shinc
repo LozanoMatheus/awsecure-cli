@@ -1,0 +1,27 @@
+declare -lr AWSECURE_CLI_LOG_FILEPATH=/tmp/awsecure-cli.log.$(date +'%Y%m%d')
+[[ ! -f "${AWSECURE_CLI_LOG_FILEPATH// /}" ]] && mktemp ${AWSECURE_CLI_LOG_FILEPATH} &> /dev/null
+declare -l AWSECURE_CLI_MUTED="${AWSECURE_CLI_MUTED:-"false"}"
+declare -l AWSECURE_CLI_LOG_TO_FILE="${AWSECURE_CLI_LOG_TO_FILE:-"false"}"
+
+function awsecure_cli_log_info() {
+  case "${AWSECURE_CLI_MUTED// /}-${AWSECURE_CLI_LOG_TO_FILE// /}" in
+  false-true)
+    echo "$(date +'%Y-%m-%d %T')Z INFO ${@}" ${AWSECURE_CLI_LOG_TO_FILE_CMD} | tee -a ${AWSECURE_CLI_LOG_FILEPATH}
+    ;;
+  false-false)
+    echo "$(date +'%Y-%m-%d %T')Z INFO ${@}" ${AWSECURE_CLI_LOG_TO_FILE_CMD}
+    ;;
+  esac
+}
+
+function awsecure_cli_log_error() {
+  case "${AWSECURE_CLI_MUTED// /}-${AWSECURE_CLI_LOG_TO_FILE// /}" in
+  false-true)
+    echo "$(date +'%Y-%m-%d %T')Z ERROR ${@}" ${AWSECURE_CLI_LOG_TO_FILE_CMD} | tee -a ${AWSECURE_CLI_LOG_FILEPATH}
+    ;;
+  false-false)
+    echo "$(date +'%Y-%m-%d %T')Z ERROR ${@}" ${AWSECURE_CLI_LOG_TO_FILE_CMD}
+    ;;
+  esac
+  false
+}
