@@ -1,0 +1,13 @@
+#!/usr/bin/env zsh
+
+set -eo pipefail
+
+. ~/.awsecure-cli
+
+if [[ $(type awsecure_cli_log_info 2> /dev/null) == "" || -z "${AWSECURE_CLI_SRC_DIRECTORY// /}" ]]; then
+  [[ -L ${0} ]] && declare -gr AWSECURE_CLI_SRC_DIRECTORY="$(realpath $(readlink ${0}) | xargs dirname)/../../src" || declare -gr AWSECURE_CLI_SRC_DIRECTORY="$(realpath ${0} | xargs dirname)/../../src"
+  . ${AWSECURE_CLI_SRC_DIRECTORY}/common/logging.shinc
+fi
+
+awsecure_cli_log_info "Using the AWSecure CLI wrapper"
+. ${AWSECURE_CLI_SRC_DIRECTORY}/common/wrapper.sh
