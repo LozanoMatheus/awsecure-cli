@@ -1,0 +1,55 @@
+name: "Build and Release"
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: '0'
+
+    - name: Set changelog
+      id: set-changelog
+      run: |
+        ARRAY_SIZE="$(jq -r '.event.commits[] | @base64' <<< '${{ toJSON(github) }}')"
+
+        for i in ${ARRAY_SIZE}; do
+          MY_COMMIT_MSG="$(base64 -d <<< "${i}" | jq -c ".message" | sed -E 's/^"|"$//g')"
+          MY_COMMIT_ID="$(base64 -d <<< "${i}" | jq -r ".id[0:7]")"
+          MY_COMMIT_URL="$(base64 -d <<< "${i}" | jq -r ".url")"
+          MY_COMMIT_AUTHOR="$(base64 -d <<< "${i}" | jq -r ".author.username")"
+          CHANGELOG+="$(echo -n "* [${MY_COMMIT_ID}](${MY_COMMIT_URL}) ${MY_COMMIT_MSG//\\n/\\\\n} @${MY_COMMIT_AUTHOR}\n")"
+        done
+
+        echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+        echo -e "$CHANGELOG" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    - name: Bump version
+      id: bump-version
+      uses: anothrnick/github-tag-action@1.35.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: true
+        RELEASE_BRANCHES: main
+        DEFAULT_BUMP: minor
+
+    - name: Create release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        name: ${{ steps.bump-version.outputs.tag }}
+        tag_name: ${{ steps.bump-version.outputs.tag }}
+        draft: false
+        prerelease: false
+        fail_on_unmatched_files: true
+        body: |
+          ## What's Changed
+          ${{ env.CHANGELOG }}
+
+          Full Changelog: ${{ github.event.compare }}
