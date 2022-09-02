@@ -37,6 +37,20 @@ awsecure_cli_log_info "Getting the AWS profile in use"
 declare -rxg AWS_PROFILE="$(awsecure_cli_get_aws_profile_set "${@}")"
 awsecure_cli_log_info "The AWS profile in use is the ${AWS_PROFILE}"
 
+function awsecure_cli_add_mfa_invoke() {
+  local -l AWSECURE_CLI_MFA_ON="${AWSECURE_CLI_MFA_ON:-"false"}"
+  case "${AWSECURE_CLI_MFA_ON// /}" in
+  true)
+    awsecure_cli_log_info "Setting up the AWS_SESSION_TOKEN."
+    . ${AWSECURE_CLI_SRC_DIRECTORY}/common/add_mfa_on_cli.sh
+    ;;
+  *)
+    awsecure_cli_log_info "The AWSECURE_CLI_MFA_ON is not set to true. Skiping adding AWS MFA code to this session"
+    ;;
+  esac
+}
+awsecure_cli_add_mfa_invoke
+
 function awsecure_cli_autorotate_invoke() {
   local -l AWSECURE_CLI_AUTOROTATE_AWS_ACCESS_KEYS="${AWSECURE_CLI_AUTOROTATE_AWS_ACCESS_KEYS:-"true"}"
   case "${AWSECURE_CLI_AUTOROTATE_AWS_ACCESS_KEYS// /}" in
