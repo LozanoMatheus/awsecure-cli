@@ -101,7 +101,10 @@ These are the configurations that you can define in your `~/.awsecure-cli`.
 | AWSECURE_CLI_AUTOROTATE_AWS_ACCESS_KEYS | true        | true<br>false                | Enable the AWS Access Keys autorotation |
 | AWSECURE_CLI_AUTOROTATE_PERIOD          | 168         | 1 to ...                     | This value is based on hours and once your AWS Access Keys are older than this, it will autorotate (168 hours == 7 days) |
 | AWSECURE_CLI_AUTOROTATE_CHECK           | daily       | daily<br>on-reboot<br>always | This is when the autorotate will be executed.<br>If you're using in the user request, this will only be triggered if you run the AWS CLI |
-| AWSECURE_CLI_AUTOROTATE_ONLY            | not defined | true<br>false                | This trigger the only the AWS Access Keys auto-rotation, any AWS command (e.g. `aws lambda list-functions`) will be ignored |
+| AWSECURE_CLI_AUTOROTATE_ONLY            | not defined | true<br>false                | This trigger only the AWS Access Keys auto-rotation, any AWS command (e.g. `aws lambda list-functions`) will be ignored |
+| AWSECURE_CLI_MFA_ON                     | false       | true<br>false                | This will add the AWS_SESSION_TOKEN on (almost) all AWS CLI request. You need to set AWSECURE_CLI_MFA_AUTO_GET_DEVICE or AWSECURE_CLI_MFA_AWS_ARN |
+| AWSECURE_CLI_MFA_AUTO_GET_DEVICE        | true        | true<br>false                | This will automatically get the first AWS MFA device configured in your user and set the AWSECURE_CLI_MFA_AWS_ARN |
+| AWSECURE_CLI_MFA_AWS_ARN                | false       | string                       | This is the AWS ARN for the MFA device configured in your user. The ARN starts with `arn:aws:iam::<AWS_Account_ID>:sms-mfa/` or `arn:aws:iam::<AWS_Account_ID>:mfa`. Please, check the "[Checking MFA status](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_checking-status.html) official documentation." |
 
 > \* mandatory parameter
 
