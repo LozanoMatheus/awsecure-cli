@@ -42,7 +42,7 @@ function awsecure_cli_set_mfa_session_token() {
   older|none)
     awsecure_cli_log_info "Your MFA session token is older than ${AWSECURE_CLI_MFA_TOKEN_DURATION_SECOND}, renewing it."
     echo "Please, inform your MFA code (e.g. 123 456): "
-    read -r AWSECURE_CLI_MFA_CODE_TMP
+    read -t 30 -r AWSECURE_CLI_MFA_CODE_TMP
     local -r AWSECURE_CLI_MFA_CODE="${AWSECURE_CLI_MFA_CODE_TMP// /}"
 
     local -r AWS_SESSION_TOKEN="$(${AWSECURE_CLI_AWS_BIN_FILEPATH} sts get-session-token --serial-number "${AWSECURE_CLI_MFA_AWS_ARN}" --token-code ${AWSECURE_CLI_MFA_CODE} --duration-second "${AWSECURE_CLI_MFA_TOKEN_DURATION_SECOND}" | jq -r '.Credentials.SessionToken')"
