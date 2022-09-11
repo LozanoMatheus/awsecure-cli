@@ -35,17 +35,17 @@ function awsecure_cli_get_user() {
 
 function awsecure_cli_set_mfa_session_token() {
   local -r AWSECURE_CLI_MFA_TOKEN_FILE=~/.awsecure-cli-mfa-session-token-${AWS_PROFILE// /}
-  local -i AWSECURE_CLI_MFA_TOKEN_DURATION_SECOND="${AWSECURE_CLI_MFA_TOKEN_DURATION_SECOND:-"900"}"
+  local -i AWSECURE_CLI_MFA_TOKEN_DURATION="${AWSECURE_CLI_MFA_TOKEN_DURATION:-"900"}"
 
   awsecure_cli_mfa_check_session_age
   case "${AWSECURE_CLI_MFA_CHECK_SESSION_AGE// /}" in
   older|none)
-    awsecure_cli_log_info "Your MFA session token is older than ${AWSECURE_CLI_MFA_TOKEN_DURATION_SECOND}, renewing it."
+    awsecure_cli_log_info "Your MFA session token is older than ${AWSECURE_CLI_MFA_TOKEN_DURATION}, renewing it."
     echo "Please, inform your MFA code (e.g. 123 456): "
     read -t 30 -r AWSECURE_CLI_MFA_CODE_TMP
     local -r AWSECURE_CLI_MFA_CODE="${AWSECURE_CLI_MFA_CODE_TMP// /}"
 
-    local -r AWS_SESSION_TOKEN="$(${AWSECURE_CLI_AWS_BIN_FILEPATH} sts get-session-token --serial-number "${AWSECURE_CLI_MFA_AWS_ARN}" --token-code ${AWSECURE_CLI_MFA_CODE} --duration-second "${AWSECURE_CLI_MFA_TOKEN_DURATION_SECOND}" | jq -r '.Credentials.SessionToken')"
+    local -r AWS_SESSION_TOKEN="$(${AWSECURE_CLI_AWS_BIN_FILEPATH} sts get-session-token --serial-number "${AWSECURE_CLI_MFA_AWS_ARN}" --token-code ${AWSECURE_CLI_MFA_CODE} --duration-second "${AWSECURE_CLI_MFA_TOKEN_DURATION}" | jq -r '.Credentials.SessionToken')"
     : "${AWS_SESSION_TOKEN:?"Variable not set or empty"}"
 
     rm -f ${AWSECURE_CLI_MFA_TOKEN_FILE}
@@ -53,14 +53,14 @@ function awsecure_cli_set_mfa_session_token() {
     chmod 0400 ${AWSECURE_CLI_MFA_TOKEN_FILE}
     ;;
   newer)
-    awsecure_cli_log_info "Your MFA session token is newer than ${AWSECURE_CLI_MFA_TOKEN_DURATION_SECOND}, reusing it."
+    awsecure_cli_log_info "Your MFA session token is newer than ${AWSECURE_CLI_MFA_TOKEN_DURATION}, reusing it."
     . ${AWSECURE_CLI_MFA_TOKEN_FILE}
     ;;
   esac
 }
 
 function awsecure_cli_mfa_check_session_age() {
-  [[ -f ${AWSECURE_CLI_MFA_TOKEN_FILE} ]] && local -lrg AWSECURE_CLI_MFA_CHECK_SESSION_AGE="$(find ${AWSECURE_CLI_MFA_TOKEN_FILE} -type f -newermt "-${AWSECURE_CLI_MFA_TOKEN_DURATION_SECOND} seconds" | grep . > /dev/null 2>&1 && echo "newer" || echo "older")" || local -lrg AWSECURE_CLI_MFA_CHECK_SESSION_AGE="none"
+  [[ -f ${AWSECURE_CLI_MFA_TOKEN_FILE} ]] && local -lrg AWSECURE_CLI_MFA_CHECK_SESSION_AGE="$(find ${AWSECURE_CLI_MFA_TOKEN_FILE} -type f -newermt "-${AWSECURE_CLI_MFA_TOKEN_DURATION} seconds" | grep . > /dev/null 2>&1 && echo "newer" || echo "older")" || local -lrg AWSECURE_CLI_MFA_CHECK_SESSION_AGE="none"
 }
 
 function awsecure_cli_mfa_session_token() {
