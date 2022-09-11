@@ -105,6 +105,7 @@ These are the configurations that you can define in your `~/.awsecure-cli`.
 | AWSECURE_CLI_MFA_ON                     | false       | true<br>false                | This will add the AWS_SESSION_TOKEN on (almost) all AWS CLI request. You need to set AWSECURE_CLI_MFA_AUTO_GET_DEVICE or AWSECURE_CLI_MFA_AWS_ARN |
 | AWSECURE_CLI_MFA_AUTO_GET_DEVICE        | true        | true<br>false                | This will automatically get the first AWS MFA device configured in your user and set the AWSECURE_CLI_MFA_AWS_ARN |
 | AWSECURE_CLI_MFA_AWS_ARN                | false       | string                       | This is the AWS ARN for the MFA device configured in your user. The ARN starts with `arn:aws:iam::<AWS_Account_ID>:sms-mfa/` or `arn:aws:iam::<AWS_Account_ID>:mfa`. Please, check the "[Checking MFA status](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_checking-status.html) official documentation." |
+| AWSECURE_CLI_MFA_TOKEN_DURATION_SECOND  | 900         | int                          | This is how long the token will be valid. The token will be temporarly stored locally and renewed once is reaches the time informed. Valid range: Minimum value of 900. Maximum value of 129600 - Please, check the [AWS official documentation - AWS STS API Reference](https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html#API_GetSessionToken_RequestParameters) |
 
 > \* mandatory parameter
 
